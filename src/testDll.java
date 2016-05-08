@@ -1,6 +1,5 @@
 import com.jacob.activeX.ActiveXComponent;
-import com.jacob.com.Dispatch;
-import com.jacob.com.Variant;
+import com.jacob.com.*;
 
 /**
  * Created by SerP on 07.05.2016.
@@ -8,15 +7,55 @@ import com.jacob.com.Variant;
 public class testDll {
 
     public static void main(String[] args) {
-        ActiveXComponent xl = new ActiveXComponent("TestServer");
+
+        String path = System.getProperty("java.library.path");
+        System.out.println(path);
+        System.loadLibrary("jacob-1.18-x86");
+
+        //ActiveXComponent xl = new ActiveXComponent("Project2.test");
+        //TestServer.EventTest
+        ActiveXComponent xl = new ActiveXComponent("TestServer.EventTest");
         Object xlo = xl.getObject();
         try {
 
-            System.out.println("version="+xl.getProperty("Version"));
-            System.out.println("version="+ Dispatch.get((Dispatch) xlo, "Version"));
+            Object res = xl.invoke("Method2", " SomeText");
+
+            System.out.printf(res.toString());
+            //System.out.println("version="+xl.getProperty("Version"));
+            //System.out.println("version="+ Dispatch.get((Dispatch) xlo, "Version"));
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
+        try {
+            ActiveXComponent c = xl;
+            if (c != null) {
+                //System.out.println("Version:"+c.getProperty("Version"));
+                InvocationProxy proxy = new InvocationProxy() {
+                    @Override
+                    public Variant invoke(String methodName, Variant[] targetParameters) {
+                        System.out.println("*** Event ***: " + methodName + " param: " + targetParameters[0].toString() );
+                        //return targetParameters[0];
+                        return null;
+                    }
+                };
+                DispatchEvents de = new DispatchEvents((Dispatch) c.getObject(), proxy);
+                c.invoke("OnStatusChanged", new Variant[] {
+                        new Variant("aaaa")
+
+                });
+                System.out.println("Wating for events ...");
+                Thread.sleep(20000); // 60 seconds is long enough
+                System.out.println("Cleaning up ...");
+                c.safeRelease();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            ComThread.Release();
+        }
+
             /*
             xl.setProperty("Visible", new Variant(true));
             Object workbooks = xl.getProperty("Workbooks").toDispatch();
