@@ -4,7 +4,7 @@ import com.jacob.com.*;
 /**
  * Created by SerP on 07.05.2016.
  */
-public class testDll {
+public class testExe {
 
     public static void main(String[] args) {
 
@@ -12,15 +12,36 @@ public class testDll {
         System.out.println(path);
         System.loadLibrary("jacob-1.18-x86");
 
-        //ActiveXComponent xl = new ActiveXComponent("Project2.test");
+        //String Serv = "TestServer.EventTest";
+        String Serv = "TestNew.ComO";
+        ActiveXComponent xl = new ActiveXComponent(Serv);
         //TestServer.EventTest
-        ActiveXComponent xl = new ActiveXComponent("TestServer.EventTest");
+        //ActiveXComponent xl = new ActiveXComponent("Project3.TestNew");
+
+
         Object xlo = xl.getObject();
+
+        InvocationProxy proxy = new InvocationProxy() {
+            @Override
+            public Variant invoke(String methodName, Variant[] targetParameters) {
+
+                System.out.println("*** Event ***: " + methodName + " param: " + targetParameters.toString() );
+
+                return null;
+            }
+        };
+        DispatchEvents de = new DispatchEvents((Dispatch) xl.getObject(), proxy);
+
         try {
 
-            Object res = xl.invoke("Method2", " SomeText");
+            Object t1 = xl.getProperty("emsxml");
+            System.out.println("Str emsxml= " + t1.toString());
+            xl.setProperty("emsxml", new Variant("aaaam"));
+            Object t2 = xl.getProperty("emsxml");
+            System.out.println("Str emsxml= " + t2.toString());
+            //Object res = xl.invoke("ems", "SomeText");
 
-            System.out.printf(res.toString());
+            //System.out.printf(res.toString());
             //System.out.println("version="+xl.getProperty("Version"));
             //System.out.println("version="+ Dispatch.get((Dispatch) xlo, "Version"));
         } catch (Exception e) {
@@ -29,9 +50,9 @@ public class testDll {
 
 
         try {
-            ActiveXComponent c = xl;
-            if (c != null) {
+            if (xl != null) {
                 //System.out.println("Version:"+c.getProperty("Version"));
+                /*
                 InvocationProxy proxy = new InvocationProxy() {
                     @Override
                     public Variant invoke(String methodName, Variant[] targetParameters) {
@@ -40,7 +61,8 @@ public class testDll {
                         return null;
                     }
                 };
-                DispatchEvents de = new DispatchEvents((Dispatch) c.getObject(), proxy);
+                DispatchEvents de = new DispatchEvents((Dispatch) xl.getObject(), proxy);
+                */
                 /*
                 c.invoke("OnStatusChanged", new Variant[] {
                         new Variant("aaaa")
@@ -50,7 +72,7 @@ public class testDll {
                 System.out.println("Wating for events ...");
                 Thread.sleep(20000); // 60 seconds is long enough
                 System.out.println("Cleaning up ...");
-                c.safeRelease();
+                xl.safeRelease();
             }
         } catch (Exception e) {
             e.printStackTrace();
