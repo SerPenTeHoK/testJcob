@@ -24,26 +24,22 @@ public class testExe {
         InvocationProxy proxy = new InvocationProxy() {
             @Override
             public Variant invoke(String methodName, Variant[] targetParameters) {
-
                 System.out.println("*** Event ***: " + methodName + " param: " + targetParameters.toString() );
-
                 return null;
             }
         };
         DispatchEvents de = new DispatchEvents((Dispatch) xl.getObject(), proxy);
 
         try {
-
+            System.out.println("\nGet emsxml str, must be empty");
             Object t1 = xl.getProperty("emsxml");
             System.out.println("Str emsxml= " + t1.toString());
-            xl.setProperty("emsxml", new Variant("aaaam"));
+            String someString = "aaaam";
+            System.out.println("\nSet emsxml str = \'" + someString+"\'");
+            xl.setProperty("emsxml", new Variant(someString));
             Object t2 = xl.getProperty("emsxml");
+            System.out.println("\nGet emsxml str: ");
             System.out.println("Str emsxml= " + t2.toString());
-            //Object res = xl.invoke("ems", "SomeText");
-
-            //System.out.printf(res.toString());
-            //System.out.println("version="+xl.getProperty("Version"));
-            //System.out.println("version="+ Dispatch.get((Dispatch) xlo, "Version"));
         } catch (Exception e) {
             e.printStackTrace();
         }
