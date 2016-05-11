@@ -18,7 +18,6 @@ public class testExe {
         //TestServer.EventTest
         //ActiveXComponent xl = new ActiveXComponent("Project3.TestNew");
 
-
         Object xlo = xl.getObject();
 
         InvocationProxy proxy = new InvocationProxy() {
